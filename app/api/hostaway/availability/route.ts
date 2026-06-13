@@ -2,31 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getHostawayListingById,
   getHostawayListingByPropertyId,
+  getHostawayListingByPropertySlug,
   getMockAvailability,
 } from "../../../data/hostaway";
 
 export async function GET(request: NextRequest) {
   const listingIdParam = request.nextUrl.searchParams.get("listingId");
   const propertyIdParam = request.nextUrl.searchParams.get("propertyId");
+  const propertySlugParam = request.nextUrl.searchParams.get("propertySlug");
+  const identifiers = [listingIdParam, propertyIdParam, propertySlugParam].filter(Boolean);
 
-  if (!listingIdParam && !propertyIdParam) {
+  if (identifiers.length === 0) {
     return NextResponse.json(
       {
         error: {
           code: "MISSING_PROPERTY_ID",
-          message: "Provide either a propertyId or listingId query parameter.",
+          message: "Provide a propertyId, propertySlug, or listingId query parameter.",
         },
       },
       { status: 400 },
     );
   }
 
-  if (listingIdParam && propertyIdParam) {
+  if (identifiers.length > 1) {
     return NextResponse.json(
       {
         error: {
           code: "MULTIPLE_PROPERTY_IDS",
-          message: "Provide only one query parameter: propertyId or listingId.",
+          message: "Provide only one query parameter: propertyId, propertySlug, or listingId.",
         },
       },
       { status: 400 },
@@ -38,14 +41,18 @@ export async function GET(request: NextRequest) {
     ? Number.isInteger(numericListingId) && numericListingId
       ? getHostawayListingById(numericListingId)
       : undefined
-    : getHostawayListingByPropertyId(propertyIdParam!);
+    : propertySlugParam
+      ? getHostawayListingByPropertySlug(propertySlugParam)
+      : getHostawayListingByPropertyId(propertyIdParam!);
 
   if (!listing) {
     return NextResponse.json(
       {
         error: {
           code: "PROPERTY_NOT_FOUND",
-          message: `No mock Hostaway property was found for ${listingIdParam ? "listingId" : "propertyId"} "${listingIdParam ?? propertyIdParam}".`,
+          message: `No mock Hostaway property was found for ${
+            listingIdParam ? "listingId" : propertySlugParam ? "propertySlug" : "propertyId"
+          } "${listingIdParam ?? propertySlugParam ?? propertyIdParam}".`,
         },
       },
       { status: 404 },

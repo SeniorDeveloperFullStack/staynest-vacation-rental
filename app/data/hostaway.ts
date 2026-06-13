@@ -88,9 +88,18 @@ export function getHostawayListingById(listingId: number) {
 }
 
 export function getHostawayListingByPropertyId(propertyId: string) {
+  const numericPropertyId = Number(propertyId);
+
   return hostawayListings.find(
-    (listing) => listing.propertySlug === propertyId || listing.externalListingId === propertyId,
+    (listing) =>
+      listing.propertySlug === propertyId ||
+      listing.externalListingId === propertyId ||
+      (Number.isInteger(numericPropertyId) && listing.id === numericPropertyId),
   );
+}
+
+export function getHostawayListingByPropertySlug(propertySlug: string) {
+  return hostawayListings.find((listing) => listing.propertySlug === propertySlug);
 }
 
 export function getMockAvailability(listingId: number) {

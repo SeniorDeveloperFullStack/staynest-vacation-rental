@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { HostawayPropertyIntegration } from "../../components/HostawayPropertyIntegration";
 import { Icon } from "../../components/icons";
+import { PropertyBookingExperience } from "../../components/PropertyBookingExperience";
 import { PropertyGallery } from "../../components/PropertyGallery";
 import { getProperty, properties } from "../../data/properties";
 
@@ -34,42 +34,7 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
 
       <section className="section property-content">
         <div className="shell property-layout">
-          <div className="property-main">
-            <div className="stay-summary">
-              <h2>{property.description}</h2>
-              <div className="property-meta big">
-                <span><Icon name="users" />{property.guests} guests</span>
-                <span><Icon name="bed" />{property.bedrooms} bedrooms</span>
-                <span><Icon name="bath" />{property.bathrooms} bathrooms</span>
-              </div>
-            </div>
-
-            <div className="prose">
-              <div className="section-kicker">About this home</div>
-              <p>{property.longDescription}</p>
-            </div>
-
-            <HostawayPropertyIntegration property={property} variant="content" />
-
-            <div className="amenities">
-              <div className="section-kicker">Everything you need</div>
-              <h2>Amenities</h2>
-              <div>
-                {property.amenities.map((amenity) => (
-                  <span key={amenity}><Icon name="check" />{amenity}</span>
-                ))}
-              </div>
-            </div>
-
-            <div className="highlights">
-              <div className="section-kicker">Why you'll love it</div>
-              {property.highlights.map((item, index) => (
-                <span key={item}><b>0{index + 1}</b>{item}</span>
-              ))}
-            </div>
-          </div>
-
-          <HostawayPropertyIntegration property={property} variant="booking" />
+          <PropertyBookingExperience property={property} />
         </div>
       </section>
 

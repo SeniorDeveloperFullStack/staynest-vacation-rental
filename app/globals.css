@@ -404,6 +404,13 @@ blockquote p { font-size:19px; font-weight:500; }
 .booking-price strong { font-size:32px; font-weight:700; }
 .booking-price span { font-size:12px; }
 .booking-dot { color:#a9b5b0!important; margin:0 2px; }
+.booking-status-row { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:16px; color:var(--muted); font-size:12px; }
+.booking-status { border-radius:999px; padding:6px 9px; font-weight:700; text-transform:capitalize; }
+.booking-status.available { background:#e6f3eb; color:#1d6f50; }
+.next-dates { display:grid; gap:8px; background:#f5f7f4; border:1px solid #dfe8e2; border-radius:14px; padding:14px; margin-bottom:14px; }
+.next-dates>strong { font-size:12px; }
+.next-dates span { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; }
+.next-dates b { color:var(--ink); }
 .date-grid { border:1px solid #d9e1dc; border-radius:14px; overflow:hidden; margin-bottom:14px; }
 .date-grid label { padding:13px; font-size:10px; letter-spacing:.07em; }
 .date-grid input,.date-grid select { font-size:12px; color:var(--ink); min-height:24px; }
