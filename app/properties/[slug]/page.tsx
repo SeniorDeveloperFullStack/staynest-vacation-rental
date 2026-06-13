@@ -1,25 +1,17 @@
 import { notFound } from "next/navigation";
-import { AvailabilitySection } from "../../components/AvailabilitySection";
-import { BookingCTA } from "../../components/BookingCTA";
+import { HostawayPropertyIntegration } from "../../components/HostawayPropertyIntegration";
 import { Icon } from "../../components/icons";
 import { PropertyGallery } from "../../components/PropertyGallery";
-import { getHostawayListingBySlug, getMockAvailability, hostawayListings } from "../../data/hostaway";
-import { getProperty } from "../../data/properties";
+import { getProperty, properties } from "../../data/properties";
 
 export function generateStaticParams() {
-  return hostawayListings.map(({ propertySlug }) => ({ slug: propertySlug }));
+  return properties.map(({ slug }) => ({ slug }));
 }
 
 export default async function PropertyDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const listing = getHostawayListingBySlug(slug);
-
-  if (!listing) notFound();
-
-  const property = getProperty(listing.propertySlug);
+  const property = getProperty(slug);
   if (!property) notFound();
-
-  const availability = getMockAvailability(listing.id);
 
   return (
     <>
@@ -46,9 +38,9 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
             <div className="stay-summary">
               <h2>{property.description}</h2>
               <div className="property-meta big">
-                <span><Icon name="users" />{listing.maxGuests} guests</span>
-                <span><Icon name="bed" />{listing.bedrooms} bedrooms</span>
-                <span><Icon name="bath" />{listing.bathrooms} bathrooms</span>
+                <span><Icon name="users" />{property.guests} guests</span>
+                <span><Icon name="bed" />{property.bedrooms} bedrooms</span>
+                <span><Icon name="bath" />{property.bathrooms} bathrooms</span>
               </div>
             </div>
 
@@ -57,24 +49,7 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
               <p>{property.longDescription}</p>
             </div>
 
-            <div className="hostaway-demo">
-              <span className="integration-icon"><Icon name="check" /></span>
-              <div className="integration-copy">
-                <div className="section-kicker">Hostaway-style integration demo</div>
-                <h2>Built for a seamless booking flow.</h2>
-                <p>
-                  Mock listing, pricing, and calendar data are already connected. Real Hostaway credentials can be added securely
-                  on the server for live availability and booking.
-                </p>
-              </div>
-              <div className="integration-meta">
-                <span><strong>Listing ID</strong>{listing.externalListingId}</span>
-                <span><strong>Status</strong>{listing.channelStatus}</span>
-                <span><strong>Mock sync</strong>{new Date(listing.syncedAt).toLocaleDateString("en-US")}</span>
-              </div>
-            </div>
-
-            <AvailabilitySection listing={listing} availability={availability} />
+            <HostawayPropertyIntegration property={property} variant="content" />
 
             <div className="amenities">
               <div className="section-kicker">Everything you need</div>
@@ -94,7 +69,7 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
             </div>
           </div>
 
-          <BookingCTA property={property} bookingUrl={listing.bookingUrl} />
+          <HostawayPropertyIntegration property={property} variant="booking" />
         </div>
       </section>
 

@@ -181,6 +181,20 @@ blockquote footer span { color:var(--muted); }
 .booking-list { border-top:1px solid var(--line); display:grid; gap:12px; padding-top:18px; }
 .booking-list span { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:10px; }
 .booking-list svg { width:14px; height:14px; color:#9b7955; }
+.api-state { min-height:180px; display:flex; align-items:center; gap:16px; border:1px solid var(--line); border-radius:20px; background:white; padding:28px; margin:45px 0; }
+.api-state-booking { position:sticky; top:96px; min-height:220px; margin:0; box-shadow:var(--shadow-lg); }
+.api-state>span:not(.loading-spinner) { width:40px; height:40px; display:grid; place-items:center; border-radius:12px; flex:0 0 auto; }
+.api-state svg { width:19px; height:19px; }
+.api-state strong { display:block; font-size:15px; margin-bottom:4px; }
+.api-state p { color:var(--muted); font-size:13px; margin:0; }
+.api-error { border-color:#edcfc8; background:#fff9f7; }
+.api-error>span { background:#f6dfda; color:#9b493a; }
+.api-error button { border:0; background:transparent; color:var(--forest); padding:0; margin-top:12px; font-weight:700; font-size:12px; text-decoration:underline; }
+.loading-spinner { width:28px; height:28px; flex:0 0 auto; border:3px solid #d8e4de; border-top-color:var(--forest); border-radius:50%; animation:spin .8s linear infinite; }
+.route-state { min-height:70vh; display:grid; place-items:center; align-content:center; text-align:center; padding:40px 20px; }
+.route-state h1 { font-size:clamp(38px,6vw,62px); margin:22px 0 10px; }
+.route-state p { color:var(--muted); margin-bottom:24px; }
+@keyframes spin { to { transform:rotate(360deg); } }
 .map-section { background:var(--cream); padding:90px 0; }
 .map-section>.shell { display:grid; grid-template-columns:1fr 2fr; gap:70px; align-items:center; }
 .map-section h2 { font-size:40px; }
@@ -424,5 +438,6 @@ blockquote p { font-size:19px; font-weight:500; }
   .night-date { display:block; }
   .night-date span,.night-date strong { display:block; }
   .booking-card { padding:20px; border-radius:16px; }
+  .api-state-booking { position:static; }
   .form-card { padding:24px; }
 }

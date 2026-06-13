@@ -87,13 +87,18 @@ export function getHostawayListingById(listingId: number) {
   return hostawayListings.find((listing) => listing.id === listingId);
 }
 
-export function getMockAvailability(listingId?: number) {
-  const listings = listingId ? hostawayListings.filter((listing) => listing.id === listingId) : hostawayListings;
-
-  return listings.flatMap((listing) =>
-    (availabilitySeed[listing.propertySlug] ?? []).map((night) => ({
-      listingId: listing.id,
-      ...night,
-    })),
+export function getHostawayListingByPropertyId(propertyId: string) {
+  return hostawayListings.find(
+    (listing) => listing.propertySlug === propertyId || listing.externalListingId === propertyId,
   );
+}
+
+export function getMockAvailability(listingId: number) {
+  const listing = getHostawayListingById(listingId);
+  if (!listing) return [];
+
+  return (availabilitySeed[listing.propertySlug] ?? []).map((night) => ({
+    listingId: listing.id,
+    ...night,
+  }));
 }
