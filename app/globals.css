@@ -53,6 +53,7 @@ em { font-weight:400; color:#c3a77f; }
 .section-heading { display:flex; align-items:end; justify-content:space-between; margin-bottom:45px; }
 .section-heading h2 { margin:0; }
 .property-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+.home-property-grid { grid-template-columns:repeat(4,1fr); }
 .property-grid-two { grid-template-columns:repeat(2,1fr); gap:46px 32px; }
 .property-card { display:block; background:white; box-shadow:0 14px 50px rgba(24,53,45,.08); transition:.3s; overflow:hidden; }
 .property-card:hover { transform:translateY(-6px); box-shadow:0 20px 60px rgba(24,53,45,.13); }
@@ -190,6 +191,8 @@ blockquote footer span { color:var(--muted); }
 .api-error { border-color:#edcfc8; background:#fff9f7; }
 .api-error>span { background:#f6dfda; color:#9b493a; }
 .api-error button { border:0; background:transparent; color:var(--forest); padding:0; margin-top:12px; font-weight:700; font-size:12px; text-decoration:underline; }
+.api-success { grid-column:1/-1; display:flex; align-items:center; gap:8px; width:max-content; max-width:100%; border-radius:999px; background:#e6f3eb; color:#1d6f50; padding:10px 13px; font-size:12px; font-weight:700; }
+.api-success svg { width:16px; height:16px; }
 .loading-spinner { width:28px; height:28px; flex:0 0 auto; border:3px solid #d8e4de; border-top-color:var(--forest); border-radius:50%; animation:spin .8s linear infinite; }
 .route-state { min-height:70vh; display:grid; place-items:center; align-content:center; text-align:center; padding:40px 20px; }
 .route-state h1 { font-size:clamp(38px,6vw,62px); margin:22px 0 10px; }
@@ -248,6 +251,7 @@ blockquote footer span { color:var(--muted); }
   .hero-content h1 { font-size:60px; }
   .intro-grid,.faq-layout,.property-layout,.map-section>.shell,.contact-layout { grid-template-columns:1fr; gap:45px; }
   .property-grid { grid-template-columns:1fr; }
+  .home-property-grid { grid-template-columns:repeat(2,1fr); }
   .property-grid-two { grid-template-columns:1fr; }
   .property-image,.property-grid-two .property-image { height:360px; }
   .split-story { grid-template-columns:1fr; }
@@ -273,6 +277,7 @@ blockquote footer span { color:var(--muted); }
   .hero-content>span { font-size:14px; }
   .section-heading { align-items:start; gap:20px; flex-direction:column; }
   .property-image,.property-grid-two .property-image { height:280px; }
+  .home-property-grid { grid-template-columns:1fr; }
   .property-meta { gap:10px; }
   .split-image { height:350px; }
   .split-copy { padding:60px 22px; }

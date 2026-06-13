@@ -21,10 +21,10 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
             <div className="section-kicker">{property.eyebrow}</div>
             <h1>{property.name}</h1>
             <p>
-              <Icon name="map" /> {property.location} <span>•</span> <Icon name="star" /> {property.rating} ({property.reviews} reviews)
+              <Icon name="map" /> {property.location} <span>|</span> <Icon name="star" /> {property.rating} ({property.reviews} reviews)
             </p>
           </div>
-          <a className="button button-outline" href="#book">Check availability</a>
+          <a className="button button-outline" href="#book">Check Availability on Hostaway</a>
         </div>
       </section>
 

@@ -24,6 +24,8 @@ type IntegrationData = {
   availability: HostawayAvailabilityNight[];
 };
 
+type LoadState = "loading" | "success" | "error";
+
 async function readJson<T>(response: Response): Promise<T> {
   const data = await response.json();
   if (!response.ok) {
@@ -31,6 +33,10 @@ async function readJson<T>(response: Response): Promise<T> {
     throw new Error(message);
   }
   return data as T;
+}
+
+async function fetchJson<T>(url: string, signal: AbortSignal) {
+  return readJson<T>(await fetch(url, { signal, cache: "no-store" }));
 }
 
 export function HostawayPropertyIntegration({
@@ -41,30 +47,40 @@ export function HostawayPropertyIntegration({
   variant: "content" | "booking";
 }) {
   const [data, setData] = useState<IntegrationData | null>(null);
+  const [status, setStatus] = useState<LoadState>("loading");
   const [error, setError] = useState("");
   const [requestKey, setRequestKey] = useState(0);
 
   const loadIntegration = useCallback(async () => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 8000);
+
+    setStatus("loading");
     setError("");
     setData(null);
 
     try {
-      const listingsResponse = await fetch("/api/hostaway/listings");
-      const listingsData = await readJson<ListingsResponse>(listingsResponse);
+      const [listingsData, availabilityData] = await Promise.all([
+        fetchJson<ListingsResponse>("/api/hostaway/listings", controller.signal),
+        fetchJson<AvailabilityResponse>(
+          `/api/hostaway/availability?propertyId=${encodeURIComponent(property.slug)}`,
+          controller.signal,
+        ),
+      ]);
       const listing = listingsData.listings.find((item) => item.propertySlug === property.slug);
 
-      if (!listing) {
-        throw new Error(`No mock Hostaway listing is connected to ${property.name}.`);
+      if (!listing || listingsData.count !== 4) {
+        throw new Error(`Expected 4 mock listings and a listing for ${property.name}.`);
       }
 
-      const availabilityResponse = await fetch(
-        `/api/hostaway/availability?propertyId=${encodeURIComponent(property.slug)}`,
-      );
-      const availabilityData = await readJson<AvailabilityResponse>(availabilityResponse);
-
       setData({ listing, availability: availabilityData.availability });
+      setStatus("success");
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Unable to load booking data.");
+      const isAbort = requestError instanceof DOMException && requestError.name === "AbortError";
+      setError(isAbort ? "The mock Hostaway API took too long to respond." : requestError instanceof Error ? requestError.message : "Unable to load booking data.");
+      setStatus("error");
+    } finally {
+      window.clearTimeout(timeout);
     }
   }, [property.name, property.slug]);
 
@@ -72,51 +88,79 @@ export function HostawayPropertyIntegration({
     void loadIntegration();
   }, [loadIntegration, requestKey]);
 
-  if (error) {
-    return (
-      <div className={`api-state api-error ${variant === "booking" ? "api-state-booking" : ""}`} role="alert">
-        <span><Icon name="close" /></span>
-        <div>
-          <strong>Booking data is unavailable</strong>
-          <p>{error}</p>
-          <button onClick={() => setRequestKey((key) => key + 1)}>Try again</button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className={`api-state api-loading ${variant === "booking" ? "api-state-booking" : ""}`} aria-live="polite">
-        <span className="loading-spinner" />
-        <div><strong>Loading booking data</strong><p>Connecting to the mock Hostaway API...</p></div>
-      </div>
-    );
-  }
-
   if (variant === "booking") {
-    return <BookingCTA property={property} bookingUrl={data.listing.bookingUrl} />;
+    if (status === "success" && data) {
+      return <BookingCTA property={property} bookingUrl={data.listing.bookingUrl} />;
+    }
+
+    return (
+      <ApiState
+        status={status}
+        booking
+        error={error}
+        onRetry={() => setRequestKey((key) => key + 1)}
+      />
+    );
   }
 
   return (
     <>
-      <div className="hostaway-demo">
-        <span className="integration-icon"><Icon name="check" /></span>
+      <div className="hostaway-demo" id="hostaway-demo">
+        <span className="integration-icon"><Icon name={status === "error" ? "close" : "check"} /></span>
         <div className="integration-copy">
-          <div className="section-kicker">Hostaway-style integration demo</div>
-          <h2>Built for a seamless booking flow.</h2>
+          <div className="section-kicker">Hostaway-style booking integration demo</div>
+          <h2>{status === "success" ? "Mock Hostaway data connected." : "Built for a seamless booking flow."}</h2>
           <p>
-            Listing and calendar data below were fetched from the project&apos;s mock Hostaway API routes. Real credentials can
-            later be connected securely on the server.
+            This section loads listings and availability from the project&apos;s mock API routes. Real Hostaway credentials
+            can later be connected securely on the server without exposing secrets in frontend code.
           </p>
         </div>
-        <div className="integration-meta">
-          <span><strong>Listing ID</strong>{data.listing.externalListingId}</span>
-          <span><strong>Status</strong>{data.listing.channelStatus}</span>
-          <span><strong>Mock sync</strong>{new Date(data.listing.syncedAt).toLocaleDateString("en-US")}</span>
+        {status === "loading" && <ApiState status="loading" />}
+        {status === "error" && <ApiState status="error" error={error} onRetry={() => setRequestKey((key) => key + 1)} />}
+        {status === "success" && data && (
+          <>
+            <div className="api-success" role="status"><Icon name="check" /> Booking data loaded from the mock Hostaway API.</div>
+            <div className="integration-meta">
+              <span><strong>Listing ID</strong>{data.listing.externalListingId}</span>
+              <span><strong>Status</strong>{data.listing.channelStatus}</span>
+              <span><strong>Mock sync</strong>{new Date(data.listing.syncedAt).toLocaleDateString("en-US")}</span>
+            </div>
+          </>
+        )}
+      </div>
+      {status === "success" && data && <AvailabilitySection listing={data.listing} availability={data.availability} />}
+    </>
+  );
+}
+
+function ApiState({
+  status,
+  error,
+  booking = false,
+  onRetry,
+}: {
+  status: LoadState;
+  error?: string;
+  booking?: boolean;
+  onRetry?: () => void;
+}) {
+  if (status === "error") {
+    return (
+      <div className={`api-state api-error ${booking ? "api-state-booking" : ""}`} role="alert">
+        <span><Icon name="close" /></span>
+        <div>
+          <strong>Booking data could not load</strong>
+          <p>{error}</p>
+          {onRetry && <button onClick={onRetry}>Try again</button>}
         </div>
       </div>
-      <AvailabilitySection listing={data.listing} availability={data.availability} />
-    </>
+    );
+  }
+
+  return (
+    <div className={`api-state api-loading ${booking ? "api-state-booking" : ""}`} aria-live="polite">
+      <span className="loading-spinner" />
+      <div><strong>Loading booking data</strong><p>Connecting to the mock Hostaway API...</p></div>
+    </div>
   );
 }
