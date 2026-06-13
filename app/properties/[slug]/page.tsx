@@ -29,7 +29,7 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
             <div className="section-kicker">{property.eyebrow}</div>
             <h1>{property.name}</h1>
             <p>
-              <Icon name="map" /> {property.location} <span>·</span> <Icon name="star" /> {property.rating} ({property.reviews} reviews)
+              <Icon name="map" /> {property.location} <span>•</span> <Icon name="star" /> {property.rating} ({property.reviews} reviews)
             </p>
           </div>
           <a className="button button-outline" href="#book">Check availability</a>
@@ -58,13 +58,15 @@ export default async function PropertyDetail({ params }: { params: Promise<{ slu
             </div>
 
             <div className="hostaway-demo">
-              <div className="section-kicker">Hostaway-style booking integration demo</div>
-              <h2>Ready for live inventory, rates, and booking flow.</h2>
-              <p>
-                This page is driven by a mock Hostaway listing structure. In a real launch, the server API routes would connect
-                secure Hostaway credentials to live listings, availability, rates, and booking redirects without exposing secrets
-                in frontend code.
-              </p>
+              <span className="integration-icon"><Icon name="check" /></span>
+              <div className="integration-copy">
+                <div className="section-kicker">Hostaway-style integration demo</div>
+                <h2>Built for a seamless booking flow.</h2>
+                <p>
+                  Mock listing, pricing, and calendar data are already connected. Real Hostaway credentials can be added securely
+                  on the server for live availability and booking.
+                </p>
+              </div>
               <div className="integration-meta">
                 <span><strong>Listing ID</strong>{listing.externalListingId}</span>
                 <span><strong>Status</strong>{listing.channelStatus}</span>

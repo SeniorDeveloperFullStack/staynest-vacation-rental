@@ -15,25 +15,34 @@ export function AvailabilitySection({
       <div className="section-kicker">Live-ready calendar</div>
       <div className="availability-head">
         <div>
-          <h2>Availability preview</h2>
-          <p>
-            Mock rates and calendar status for Hostaway listing <strong>{listing.externalListingId}</strong>.
-          </p>
+          <h2>Plan your stay</h2>
+          <p>Preview nightly rates and availability. Choose your dates in the booking panel when you are ready.</p>
         </div>
         <span className="availability-pill">
           <Icon name="calendar" />
-          {availableCount} of {availability.length} sample nights open
+          {availableCount} nights available
         </span>
       </div>
       <div className="availability-grid">
-        {availability.map((night) => (
-          <article className={night.isAvailable ? "night-card available" : "night-card blocked"} key={night.date}>
-            <span>{new Date(`${night.date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-            <strong>{night.isAvailable ? "Available" : "Booked"}</strong>
-            <p>${night.nightlyRate} · {night.minimumStay} night min</p>
-          </article>
-        ))}
+        {availability.map((night) => {
+          const date = new Date(`${night.date}T12:00:00`);
+
+          return (
+            <article className={night.isAvailable ? "night-card available" : "night-card blocked"} key={night.date}>
+              <div className="night-date">
+                <span>{date.toLocaleDateString("en-US", { weekday: "short" })}</span>
+                <strong>{date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</strong>
+              </div>
+              <span className="night-status">{night.isAvailable ? "Available" : "Booked"}</span>
+              <p><strong>${night.nightlyRate}</strong> / night</p>
+              <small>{night.minimumStay} night minimum</small>
+            </article>
+          );
+        })}
       </div>
+      <p className="availability-caption">
+        Demo calendar for listing {listing.externalListingId}. Live dates would sync through the secure Hostaway API route.
+      </p>
     </section>
   );
 }
